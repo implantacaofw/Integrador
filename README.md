@@ -1,7 +1,3 @@
-# FW7 - integrador.service
-
-[![Build Status](https://semaphoreci.com/api/v1/projects/98776d66-5d7b-418b-ab51-e9109daee5b0/2271518/badge.svg)](https://semaphoreci.com/fw7/fw7-integrador-service)
-
 ## Proposta
 
 Olá amigos! Este projeto é referente ao integrador que colocamos pra rodar nas máquina/servidores de nosso clientes.
