@@ -51,16 +51,10 @@ const adapter = (function (JDBC, jinst, yaml, log) {
   /**
    * Check if it is a select query.
    */
-  function _isASelectQuery (query) {
-    const splitedQuery = query.split(' ')
-
-    return (
-      splitedQuery[0].trim() === 'SELECT' ||
-      splitedQuery[0].trim() === 'select' ||
-      splitedQuery[0].substr(0, 6) === 'SELECT' ||
-      splitedQuery[0].substr(0, 6) === 'select'
-    )
-  }
+function _isASelectQuery(query) {
+  const sanitizedQuery = query.trim().toUpperCase(); // Remove espaços em branco e deixa em maiúsculas
+  return sanitizedQuery.startsWith('SELECT') || sanitizedQuery.startsWith('WITH'); // Verifica o início da query
+}
 
   /**
    * Test if given parameter is an object.
@@ -155,85 +149,57 @@ const adapter = (function (JDBC, jinst, yaml, log) {
   /**
    * Executes the query on database.
    */
-  function executeQuery (queryToExecute) {
-    return new Promise(function (resolve, reject) {
-      try {
-        /**
-         * Reserve and execute query.
-         */
-        _getConnectionObject(function (connectionObject) {
-          log(`Usando a conexão ${connectionObject.uuid} para executar operações no banco.`)
+      function executeQuery(queryToExecute) {
+        return new Promise(function (resolve, reject) {
+          try {
+            _getConnectionObject(function (connectionObject) {
+              log(`Usando a conexão ${connectionObject.uuid} para executar operações no banco.`);
 
-          /**
-           * Executed when is a select query.
-           */
-          if (_isASelectQuery(queryToExecute)) {
-            return connectionObject.conn.createStatement(function (err, statement) {
-              /**
-               * Throw!
-               */
-              if (err) return _onError(err, reject)
+              log(`Determinado que a query é do tipo: ${_isASelectQuery(queryToExecute) ? 'SELECT' : 'UPDATE/INSERT'}`);
+              
+              // Escolha do método de execução com base no tipo da query
+              if (_isASelectQuery(queryToExecute)) {
+                return connectionObject.conn.createStatement(function (err, statement) {
+                  if (err) return _onError(err, reject);
 
-              /**
-               * Execute!
-               */
-              log('Executando a query no banco.')
-              statement.executeQuery(queryToExecute, function (err, resultSet) {
-                /**
-                 * Throw!
-                 */
-                if (err) return _onError(err, reject)
+                  log('Executando a query no banco (SELECT).');
+                  statement.executeQuery(queryToExecute, function (err, resultSet) {
+                    if (err) return _onError(err, reject);
 
-                /**
-                 * No records found.
-                 */
-                if (!resultSet || !_isObject(resultSet)) {
-                  log('Query finalizada com sucesso!')
-                  return resolve()
-                }
+                    if (!resultSet || !_isObject(resultSet)) {
+                      log('Query finalizada sem resultados.');
+                      return resolve([]);
+                    }
 
-                resultSet.toObjArray(function (err, results) {
-                  /**
-                   * Throw!
-                   */
-                  if (err) return _onError(err, reject)
+                    resultSet.toObjArray(function (err, results) {
+                      if (err) return _onError(err, reject);
 
-                  log('Query finalizada com sucesso!')
+                      log('Query SELECT finalizada com sucesso!');
+                      return resolve(_normalizeData(results));
+                    });
+                  });
+                });
+              }
 
-                  const normalizedData = _normalizeData(results)
-                  return resolve(normalizedData)
-                })
-              })
-            })
+              // Para operações de modificação
+              connectionObject.conn.createStatement(function (err, statement) {
+                if (err) return _onError(err, reject);
+
+                log('Executando a query no banco (UPDATE/INSERT).');
+                statement.executeUpdate(queryToExecute, function (err, count) {
+                  if (err) return _onError(err, reject);
+
+                  log(`Query UPDATE/INSERT finalizada com sucesso! ${count} registros afetados.`);
+                  return resolve(count);
+                });
+              });
+            }, reject);
+          } catch ({ message }) {
+            return _onError(message, reject);
           }
-
-          /**
-           * Executed when is an update or insert query.
-           */
-          return connectionObject.conn.createStatement(function (err, statement) {
-            /**
-             * Throw!
-             */
-            if (err) return _onError(err, reject)
-
-            /**
-             * Execute!
-             */
-            statement.executeUpdate(queryToExecute, function (err, count) {
-              /**
-               * Throw!
-               */
-              if (err) return _onError(err, reject)
-
-              return resolve(count)
-            })
-          })
-        }, reject)
-      } catch ({ message }) {
-        return _onError(message, reject)
+        });
       }
-    })
-  }
+
 
   /**
    * Public methods
