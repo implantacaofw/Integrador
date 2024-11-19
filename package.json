@@ -1,0 +1,49 @@
+{
+  "name": "fw7.integrador",
+  "version": "1.0.0",
+  "author": "FW7 <marcel.zanluca@gmail.com>",
+  "main": "src/server.js",
+  "license": "MIT",
+  "scripts": {
+    "service:install": "cross-env NODE_ENV=production node src/install.js",
+    "service:uninstall": "cross-env NODE_ENV=production node src/uninstall.js",
+    "dev": "cross-env NODE_ENV=dev node src/server.js",
+    "debug": "cross-env NODE_ENV=dev nodemon --inspect --inspect-port 9030 src/server.js",
+    "lint": "eslint src/",
+    "lint:fix": "eslint --fix src/",
+    "test": "cross-env NODE_ENV=test jest --config jest-config.json",
+    "test:coverage": "npm test -- --coverage",
+    "test:ci": "npm run test:coverage -- --coverageReporters=lcov && cat ./coverage/lcov.info | coveralls"
+  },
+  "dependencies": {
+    "alasql": "^0.6.5",
+    "axios": "^0.19.2",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.2",
+    "express": "^4.17.1",
+    "firebase": "^7.17.1",
+    "jdbc": "^0.7.1",
+    "method-override": "^3.0.0",
+    "moment": "^2.27.0",
+    "mysql2": "^2.1.0",
+    "node-java": "^1.0.1",
+    "node-windows": "^1.0.0-beta.5",
+    "ramda": "^0.27.0",
+    "sequelize": "^6.3.3",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "coveralls": "^3.1.0",
+    "eslint": "^7.5.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^4.2.5",
+    "jest": "^26.1.0",
+    "jest-html-reporter": "^3.1.3",
+    "nodemon": "^2.0.4"
+  }
+}

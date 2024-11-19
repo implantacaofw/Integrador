@@ -1,0 +1,19 @@
+{
+  "extends": "standard",
+  "globals": {
+    "jest": true,
+    "beforeEach": true,
+    "beforeAll": true,
+    "afterEach": true,
+    "describe": true,
+    "xdescribe": true,
+    "test": true,
+    "it": true,
+    "xit": true,
+    "fit": true,
+    "expect": true
+  },
+  "rules": {
+    "no-useless-escape": "off"
+  }
+}

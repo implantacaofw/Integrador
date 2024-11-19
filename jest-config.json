@@ -1,0 +1,15 @@
+{
+  "rootDir": "./",
+  "coverageDirectory": "coverage",
+  "collectCoverageFrom": ["src/services/*.js"],
+  "reporters": [
+    "default",
+    [
+      "./node_modules/jest-html-reporter",
+      {
+        "pageTitle": "Integration Service",
+        "outputPath": "coverage/index.html"
+      }
+    ]
+  ]
+}
