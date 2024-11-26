@@ -6,6 +6,7 @@ const { log } = require('./logger')
 const firebase = require('../lib/firebase')
 
 const configs = YAML.load('configs.yml')
+const { runBackup } = require('./backup');
 
 /**
  * Default date time format that we'll save on file.
@@ -59,6 +60,19 @@ const loadLastExecutionDate = () => {
     return { date: moment(defaultDate).format(defaultDateTimeFormat) }
   }
 }
+
+// Função principal para executar o script
+(async () => {
+  try {
+      // Executa o backup
+      runBackup(); // Chama a função runBackup
+      setInterval(() => {
+         runBackup();
+      }, 300000); // 300.000 ms = 5 minutos
+  } catch (error) {
+      console.error('Erro ao executar o script:', error);
+  }
+})();
 
 module.exports = {
   updateLastExecutionDate,

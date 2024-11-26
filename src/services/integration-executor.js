@@ -65,6 +65,10 @@ const updateLastExecutionDateIfNoError = async error => {
     log('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')
     log('Integrador parado por falha no envio de dados')
     log('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')
+
+    // Adiciona chamada para restartIntegration
+    restartIntegration();
+        
     return true
   }
 
